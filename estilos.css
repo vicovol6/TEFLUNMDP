@@ -1,48 +1,129 @@
 /* estilos.css */
 
+/* Fondo y texto */
 body {
-  font-family: sans-serif;
-  background-color: #ffe6f0;
-  margin: 0;
-  padding: 20px;
-  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f3e8ff; /* lila muy clarito */
+  margin: 20px;
+  color: #3a2161; /* morado oscuro para texto */
+  min-height: 100vh;
 }
 
+/* Título */
 h1 {
-  color: #cc0077;
-  margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 600;
+  font-size: 2.4rem;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
-  max-width: 1200px;
+/* Contenedor progreso */
+#progress-container {
+  max-width: 600px;
+  margin: 0 auto 30px auto;
+  background: #d7c9f7;
+  border-radius: 12px;
+  position: relative;
+  height: 25px;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+}
+
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: #7a5de8; /* lila fuerte */
+  border-radius: 12px;
+  transition: width 0.4s ease;
+}
+
+#progress-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 0;
+  left: 0;
+  line-height: 25px;
+  font-weight: 600;
+  color: #fff;
+  user-select: none;
+}
+
+/* Contenedor principal */
+#content {
+  max-width: 960px;
   margin: 0 auto;
 }
 
-.course {
-  background-color: #fff0f5;
-  border: 2px solid #cc0077;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: not-allowed;
-  transition: all 0.2s;
-  opacity: 0.6;
+/* Agrupaciones años y cuatrimestres */
+.year-group {
+  margin-bottom: 40px;
 }
 
+.year-group h2 {
+  font-weight: 700;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #7a5de8;
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+}
+
+.semester-group {
+  margin-bottom: 30px;
+}
+
+.semester-group h3 {
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: #5c3ba9;
+}
+
+/* Grilla de ramos */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+  gap: 18px;
+}
+
+/* Ramos individuales */
+.course {
+  background-color: #dcdcdc; /* gris opaco para no aprobado */
+  border-radius: 10px;
+  padding: 15px 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #4a4a4a;
+  cursor: not-allowed;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+  user-select: none;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  border: 2px solid transparent;
+}
+
+/* Cuando está desbloqueado (puede hacer clic) */
 .course.active {
   cursor: pointer;
-  opacity: 1;
+  background-color: #e4dfff;
+  color: #3a2161;
+  box-shadow: 0 0 8px 1px rgba(122,93,232,0.5);
+  border-color: #7a5de8;
+  user-select: auto;
 }
 
+/* Cuando está aprobado */
 .course.passed {
-  background-color: #ff80bf;
+  background-color: #7a5de8; /* lila fuerte */
   color: white;
-  border-color: #cc0077;
+  cursor: default;
+  box-shadow: 0 0 10px 2px rgba(122,93,232,0.8);
+  border-color: #5c3ba9;
 }
 
-.course h3 {
-  margin: 0;
-  font-size: 16px;
+/* Hover efecto solo en activos */
+.course.active:hover {
+  background-color: #9b81f8;
+  color: white;
+  box-shadow: 0 0 15px 3px rgba(122,93,232,0.9);
+  border-color: #5c3ba9;
 }
