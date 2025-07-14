@@ -127,3 +127,15 @@ h1 {
   box-shadow: 0 0 15px 3px rgba(122,93,232,0.9);
   border-color: #5c3ba9;
 }
+
+.nota-input {
+  margin-top: 8px;
+  width: 80%;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-align: center;
+}
+#average-display {
+  font-size: 1.1em;
+}
