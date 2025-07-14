@@ -84,7 +84,7 @@ const data = [
       {
         name: "Segundo cuatrimestre",
         courses: [
-          { id: "historia-lengua", name: "Historia de la Lengua Inglesa" },
+          { id: "historia-lengua", name: "Historia de la Lengua Inglesa", requires: ["historias-cultura"] }
           { id: "residencia-2", name: "Residencia Docente 2", requires: ["residencia-1", "practicas-1", "practicas-2", "didactica-investigacion"] },
           { id: "seminario-literatura", name: "Seminario de Literatura Comparada", requires: ["discursos-integrales"] },
           { id: "taller", name: "Taller (Optativo)" },
