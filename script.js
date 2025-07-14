@@ -1,6 +1,5 @@
-// script.js
+// script.js completo con memoria + reset
 
-// Datos agrupados por año y cuatrimestre
 const data = [
   {
     year: "Primer Año",
@@ -13,7 +12,7 @@ const data = [
           { id: "discursos-escritos", name: "Discursos Escritos", requires: ["ingles-avanzado"], unlocks: ["procesos-escritura-1"] },
           { id: "gramatica-inglesa-1", name: "Gramática Inglesa 1", requires: ["ingles-avanzado"], unlocks: ["gramatica-inglesa-2"] },
           { id: "fonetica-1", name: "Fonética 1", requires: ["ingles-avanzado"], unlocks: ["fonetica-2", "discursos-orales"] },
-        ],
+        ]
       },
       {
         name: "Segundo cuatrimestre",
@@ -21,9 +20,9 @@ const data = [
           { id: "procesos-escritura-1", name: "Procesos de Escritura 1", requires: ["discursos-escritos"], unlocks: ["discursos-integrales", "procesos-escritura-2", "teorias-del-sujeto"] },
           { id: "fonetica-2", name: "Fonética 2", requires: ["fonetica-1"], unlocks: ["fonologia-discurso", "historias-cultura"] },
           { id: "discursos-orales", name: "Discursos Orales", requires: ["fonetica-1"], unlocks: ["discursos-integrales", "fonologia-discurso", "historias-cultura"] },
-        ],
-      },
-    ],
+        ]
+      }
+    ]
   },
   {
     year: "Segundo Año",
@@ -35,7 +34,7 @@ const data = [
           { id: "procesos-escritura-2", name: "Procesos de Escritura 2", requires: ["procesos-escritura-1"], unlocks: ["practicas-1", "literatura-1"] },
           { id: "problematicas", name: "Problemática Educativa", unlocks: ["teorias-del-sujeto"] },
           { id: "teorias-del-sujeto", name: "Teorías del Sujeto y Aprendizaje", requires: ["procesos-escritura-1", "problematicas"], unlocks: ["didactica-curriculo", "metodologia-ensenanza"] },
-        ],
+        ]
       },
       {
         name: "Segundo cuatrimestre",
@@ -44,9 +43,9 @@ const data = [
           { id: "gramatica-inglesa-2", name: "Gramática Inglesa 2", requires: ["gramatica-inglesa-1"], unlocks: ["residencia-1", "historias-cultura", "didactica-investigacion", "residencia-2"] },
           { id: "historias-cultura", name: "Historias de Cultura de Habla Inglesa", requires: ["fonetica-2", "discursos-orales", "gramatica-inglesa-2"], unlocks: ["historia-contemporanea"] },
           { id: "metodologia-ensenanza", name: "Metodología de la Enseñanza", requires: ["teorias-del-sujeto"], unlocks: ["didactica-curriculo"] },
-        ],
-      },
-    ],
+        ]
+      }
+    ]
   },
   {
     year: "Tercer Año",
@@ -58,17 +57,17 @@ const data = [
           { id: "literatura-1", name: "Literatura en Lengua Inglesa 1", requires: ["procesos-escritura-2"], unlocks: ["literatura-2"] },
           { id: "historia-contemporanea", name: "Historia Contemporánea de Culturas de Habla Inglesa", requires: ["historias-cultura"] },
           { id: "didactica-curriculo", name: "Didáctica y Currículo", requires: ["teorias-del-sujeto", "metodologia-ensenanza"], unlocks: ["residencia-1", "linguistica", "metodologia-investigacion", "didactica-investigacion"] },
-        ],
+        ]
       },
       {
         name: "Segundo cuatrimestre",
         courses: [
           { id: "literatura-2", name: "Literatura en Lengua Inglesa 2", requires: ["literatura-1"] },
           { id: "residencia-1", name: "Residencia Docente 1", requires: ["gramatica-inglesa-2", "didactica-curriculo", "italiano", "practicas-sociocomunitarias"], unlocks: ["residencia-2"] },
-          { id: "gramatica-castellana", name: "Gramática Castellana (Optativa)" },
-        ],
-      },
-    ],
+          { id: "gramatica-castellana", name: "Gramática Castellana (Optativa)" }
+        ]
+      }
+    ]
   },
   {
     year: "Cuarto Año",
@@ -80,7 +79,7 @@ const data = [
           { id: "didactica-investigacion", name: "Didáctica e Investigación Educativa", requires: ["gramatica-inglesa-2", "didactica-curriculo"], unlocks: ["residencia-2"] },
           { id: "metodologia-investigacion", name: "Metodología de la Investigación Científica", requires: ["didactica-curriculo"] },
           { id: "linguistica", name: "Lingüística 1 o 2 (Optativa)", requires: ["didactica-curriculo"] },
-        ],
+        ]
       },
       {
         name: "Segundo cuatrimestre",
@@ -90,17 +89,38 @@ const data = [
           { id: "seminario-literatura", name: "Seminario de Literatura Comparada", requires: ["discursos-integrales"] },
           { id: "taller", name: "Taller (Optativo)" },
           { id: "italiano", name: "Nivel Idioma: Italiano", unlocks: ["residencia-1"] },
-          { id: "practicas-sociocomunitarias", name: "Prácticas Sociocomunitarias" },
-        ],
-      },
-    ],
+          { id: "practicas-sociocomunitarias", name: "Prácticas Sociocomunitarias" }
+        ]
+      }
+    ]
   }
 ];
 
-// Variables globales
 const content = document.getElementById('content');
-const passedCourses = new Set();
+const passedCourses = new Set(JSON.parse(localStorage.getItem("passedCourses") || "[]"));
 const courseElements = new Map();
+
+// Crear botón de reinicio
+const resetButton = document.createElement('button');
+resetButton.textContent = "Reiniciar malla";
+resetButton.style.padding = "10px 20px";
+resetButton.style.margin = "20px auto";
+resetButton.style.display = "block";
+resetButton.style.backgroundColor = "#ffb3d9";
+resetButton.style.border = "none";
+resetButton.style.borderRadius = "8px";
+resetButton.style.color = "#3a2161";
+resetButton.style.fontWeight = "600";
+resetButton.style.cursor = "pointer";
+resetButton.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+resetButton.addEventListener("click", () => {
+  if (confirm("¿Estás seguro de que querés reiniciar tu progreso?")) {
+    localStorage.removeItem("passedCourses");
+    passedCourses.clear();
+    updateCourses();
+  }
+});
+document.body.insertBefore(resetButton, content);
 
 function canUnlock(course) {
   if (!course.requires) return true;
@@ -108,7 +128,6 @@ function canUnlock(course) {
 }
 
 function updateCourses() {
-  // Actualiza estado visual de cada curso
   for (const course of courseElements.values()) {
     const { id, element, data } = course;
     if (passedCourses.has(id)) {
@@ -139,7 +158,6 @@ function updateProgressBar() {
   progressText.textContent = `${percent}% completado`;
 }
 
-// Crea la estructura visual
 function buildUI() {
   for (const yearData of data) {
     const yearDiv = document.createElement('div');
@@ -170,7 +188,7 @@ function buildUI() {
           if (!canUnlock(course)) return;
           if (passedCourses.has(course.id)) return;
           passedCourses.add(course.id);
-          // Cuando apruebo, desbloqueo los que dependen de este
+          localStorage.setItem("passedCourses", JSON.stringify([...passedCourses]));
           updateCourses();
         });
 
