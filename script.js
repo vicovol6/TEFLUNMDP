@@ -41,7 +41,7 @@ const data = [
         courses: [
           { id: "discursos-integrales", name: "Discursos Integrales", requires: ["procesos-escritura-1", "discursos-orales"], unlocks: ["seminario-literatura"] },
           { id: "gramatica-inglesa-2", name: "Gramática Inglesa 2", requires: ["gramatica-inglesa-1"], unlocks: ["residencia-1", "historias-cultura", "didactica-investigacion", "residencia-2"] },
-          { id: "historias-cultura", name: "Historias de Cultura de Habla Inglesa", requires: ["fonetica-2", "discursos-orales", "gramatica-inglesa-2"], unlocks: ["historia-contemporanea", "historia-lengua"] }, // <-- cambio acá
+          { id: "historias-cultura", name: "Historias de Cultura de Habla Inglesa", requires: ["fonetica-2", "discursos-orales", "gramatica-inglesa-2"], unlocks: ["historia-contemporanea", "historia-lengua"] },
           { id: "metodologia-ensenanza", name: "Metodología de la Enseñanza", requires: ["teorias-del-sujeto"], unlocks: ["didactica-curriculo"] },
         ]
       }
@@ -84,7 +84,7 @@ const data = [
       {
         name: "Segundo cuatrimestre",
         courses: [
-          { id: "historia-lengua", name: "Historia de la Lengua Inglesa", requires: ["historias-cultura"] }
+          { id: "historia-lengua", name: "Historia de la Lengua Inglesa", requires: ["historias-cultura"] }, // <-- corrección aquí
           { id: "residencia-2", name: "Residencia Docente 2", requires: ["residencia-1", "practicas-1", "practicas-2", "didactica-investigacion"] },
           { id: "seminario-literatura", name: "Seminario de Literatura Comparada", requires: ["discursos-integrales"] },
           { id: "taller", name: "Taller (Optativo)" },
