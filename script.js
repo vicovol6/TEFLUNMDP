@@ -1,4 +1,4 @@
-// script.js completo con memoria + reset actualizado
+// script.js completo con memoria + reset
 
 const data = [
   {
@@ -41,7 +41,7 @@ const data = [
         courses: [
           { id: "discursos-integrales", name: "Discursos Integrales", requires: ["procesos-escritura-1", "discursos-orales"], unlocks: ["seminario-literatura"] },
           { id: "gramatica-inglesa-2", name: "Gramática Inglesa 2", requires: ["gramatica-inglesa-1"], unlocks: ["residencia-1", "historias-cultura", "didactica-investigacion", "residencia-2"] },
-          { id: "historias-cultura", name: "Historias de Cultura de Habla Inglesa", requires: ["fonetica-2", "discursos-orales", "gramatica-inglesa-2"], unlocks: ["historia-contemporanea", "historia-lengua"] },
+          { id: "historias-cultura", name: "Historias de Cultura de Habla Inglesa", requires: ["fonetica-2", "discursos-orales", "gramatica-inglesa-2"], unlocks: ["historia-contemporanea", "historia-lengua"] }, // <-- cambio acá
           { id: "metodologia-ensenanza", name: "Metodología de la Enseñanza", requires: ["teorias-del-sujeto"], unlocks: ["didactica-curriculo"] },
         ]
       }
@@ -84,7 +84,7 @@ const data = [
       {
         name: "Segundo cuatrimestre",
         courses: [
-          { id: "historia-lengua", name: "Historia de la Lengua Inglesa", requires: ["historias-cultura"] },
+          { id: "historia-lengua", name: "Historia de la Lengua Inglesa" },
           { id: "residencia-2", name: "Residencia Docente 2", requires: ["residencia-1", "practicas-1", "practicas-2", "didactica-investigacion"] },
           { id: "seminario-literatura", name: "Seminario de Literatura Comparada", requires: ["discursos-integrales"] },
           { id: "taller", name: "Taller (Optativo)" },
@@ -95,83 +95,114 @@ const data = [
     ]
   }
 ];
-const state = JSON.parse(localStorage.getItem("state")) || {};
 
-function isUnlocked(course) {
+const content = document.getElementById('content');
+const passedCourses = new Set(JSON.parse(localStorage.getItem("passedCourses") || "[]"));
+const courseElements = new Map();
+
+// Crear botón de reinicio
+const resetButton = document.createElement('button');
+resetButton.textContent = "Reiniciar malla";
+resetButton.style.padding = "10px 20px";
+resetButton.style.margin = "20px auto";
+resetButton.style.display = "block";
+resetButton.style.backgroundColor = "#ffb3d9";
+resetButton.style.border = "none";
+resetButton.style.borderRadius = "8px";
+resetButton.style.color = "#3a2161";
+resetButton.style.fontWeight = "600";
+resetButton.style.cursor = "pointer";
+resetButton.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
+resetButton.addEventListener("click", () => {
+  if (confirm("¿Estás seguro de que querés reiniciar tu progreso?")) {
+    localStorage.removeItem("passedCourses");
+    passedCourses.clear();
+    updateCourses();
+  }
+});
+document.body.insertBefore(resetButton, content);
+
+function canUnlock(course) {
   if (!course.requires) return true;
-  return course.requires.every(req => state[req]);
+  return course.requires.every(reqId => passedCourses.has(reqId));
 }
 
-function updateProgressBar() {
-  const allCourses = document.querySelectorAll('.course');
-  const approvedCourses = document.querySelectorAll('.course.approved');
-  const percentage = Math.round((approvedCourses.length / allCourses.length) * 100);
-  const bar = document.querySelector('.progress-fill');
-  bar.style.width = percentage + "%";
-  bar.textContent = percentage + "%";
-}
-
-function createCourse(course) {
-  const button = document.createElement("button");
-  button.textContent = course.name;
-  button.id = course.id;
-  button.className = "course";
-  if (!isUnlocked(course)) {
-    button.disabled = true;
+function updateCourses() {
+  for (const course of courseElements.values()) {
+    const { id, element, data } = course;
+    if (passedCourses.has(id)) {
+      element.classList.add('passed');
+      element.classList.remove('active');
+      element.style.cursor = 'default';
+    } else if (canUnlock(data)) {
+      element.classList.add('active');
+      element.classList.remove('passed');
+      element.style.cursor = 'pointer';
+    } else {
+      element.classList.remove('active', 'passed');
+      element.style.cursor = 'not-allowed';
+    }
   }
-  if (state[course.id]) {
-    button.classList.add("approved");
-  }
-
-  button.addEventListener("click", () => {
-    state[course.id] = !state[course.id];
-    localStorage.setItem("state", JSON.stringify(state));
-    render();
-  });
-
-  return button;
-}
-
-function render() {
-  const container = document.getElementById("malla");
-  container.innerHTML = "";
-
-  data.forEach(year => {
-    const yearDiv = document.createElement("div");
-    yearDiv.className = "year";
-    const yearTitle = document.createElement("h2");
-    yearTitle.textContent = year.year;
-    yearDiv.appendChild(yearTitle);
-
-    year.semesters.forEach(sem => {
-      const semDiv = document.createElement("div");
-      semDiv.className = "semester";
-      const semTitle = document.createElement("h3");
-      semTitle.textContent = sem.name;
-      semDiv.appendChild(semTitle);
-
-      const courseContainer = document.createElement("div");
-      courseContainer.className = "courses";
-
-      sem.courses.forEach(course => {
-        const btn = createCourse(course);
-        courseContainer.appendChild(btn);
-      });
-
-      semDiv.appendChild(courseContainer);
-      yearDiv.appendChild(semDiv);
-    });
-
-    container.appendChild(yearDiv);
-  });
-
   updateProgressBar();
 }
 
-document.getElementById("reset").addEventListener("click", () => {
-  localStorage.removeItem("state");
-  Object.keys(state).forEach(key => delete state[key]);
-  render();
-});
+function updateProgressBar() {
+  const total = courseElements.size;
+  const passed = passedCourses.size;
+  const percent = Math.round((passed / total) * 100);
 
-render();
+  const progressBar = document.getElementById('progress-bar');
+  const progressText = document.getElementById('progress-text');
+
+  progressBar.style.width = percent + '%';
+  progressText.textContent = `${percent}% completado`;
+}
+
+function buildUI() {
+  for (const yearData of data) {
+    const yearDiv = document.createElement('div');
+    yearDiv.className = 'year-group';
+
+    const yearTitle = document.createElement('h2');
+    yearTitle.textContent = yearData.year;
+    yearDiv.appendChild(yearTitle);
+
+    for (const semData of yearData.semesters) {
+      const semDiv = document.createElement('div');
+      semDiv.className = 'semester-group';
+
+      const semTitle = document.createElement('h3');
+      semTitle.textContent = semData.name;
+      semDiv.appendChild(semTitle);
+
+      const coursesGrid = document.createElement('div');
+      coursesGrid.className = 'courses-grid';
+
+      for (const course of semData.courses) {
+        const courseDiv = document.createElement('div');
+        courseDiv.className = 'course';
+        courseDiv.id = course.id;
+        courseDiv.textContent = course.name;
+
+        courseDiv.addEventListener('click', () => {
+          if (!canUnlock(course)) return;
+          if (passedCourses.has(course.id)) return;
+          passedCourses.add(course.id);
+          localStorage.setItem("passedCourses", JSON.stringify([...passedCourses]));
+          updateCourses();
+        });
+
+        coursesGrid.appendChild(courseDiv);
+        courseElements.set(course.id, { id: course.id, element: courseDiv, data: course });
+      }
+
+      semDiv.appendChild(coursesGrid);
+      yearDiv.appendChild(semDiv);
+    }
+
+    content.appendChild(yearDiv);
+  }
+  updateCourses();
+}
+
+buildUI();
