@@ -98,7 +98,21 @@ const data = [
 
 const content = document.getElementById('content');
 const passedCourses = new Set(JSON.parse(localStorage.getItem("passedCourses") || "[]"));
+const courseNotes = JSON.parse(localStorage.getItem("courseNotes") || "{}");
 const courseElements = new Map();
+
+// Crear barra de progreso
+const progressBar = document.getElementById('progress-bar');
+const progressText = document.getElementById('progress-text');
+
+// Crear promedio
+const avgDisplay = document.createElement('div');
+avgDisplay.id = "average-display";
+avgDisplay.style.textAlign = "center";
+avgDisplay.style.marginTop = "10px";
+avgDisplay.style.fontWeight = "bold";
+avgDisplay.style.color = "#3a2161";
+document.body.insertBefore(avgDisplay, content);
 
 // Crear botón de reinicio
 const resetButton = document.createElement('button');
@@ -114,9 +128,13 @@ resetButton.style.fontWeight = "600";
 resetButton.style.cursor = "pointer";
 resetButton.style.boxShadow = "0 2px 5px rgba(0,0,0,0.1)";
 resetButton.addEventListener("click", () => {
-  if (confirm("¿Estás seguro de que querés reiniciar tu progreso?")) {
+  if (confirm("¿Estás seguro de que querés reiniciar tu progreso y notas?")) {
     localStorage.removeItem("passedCourses");
+    localStorage.removeItem("courseNotes");
     passedCourses.clear();
+    for (const input of document.querySelectorAll(".nota-input")) {
+      input.remove();
+    }
     updateCourses();
   }
 });
@@ -130,10 +148,34 @@ function canUnlock(course) {
 function updateCourses() {
   for (const course of courseElements.values()) {
     const { id, element, data } = course;
+
+    element.querySelector(".nota-input")?.remove();
+
     if (passedCourses.has(id)) {
       element.classList.add('passed');
       element.classList.remove('active');
       element.style.cursor = 'default';
+
+      // Agregar input de nota
+      const notaInput = document.createElement("input");
+      notaInput.type = "number";
+      notaInput.className = "nota-input";
+      notaInput.placeholder = "Nota (1-10)";
+      notaInput.min = 1;
+      notaInput.max = 10;
+      notaInput.value = courseNotes[id] || "";
+      notaInput.addEventListener("change", () => {
+        const nota = parseFloat(notaInput.value);
+        if (!isNaN(nota) && nota >= 1 && nota <= 10) {
+          courseNotes[id] = nota;
+        } else {
+          delete courseNotes[id];
+        }
+        localStorage.setItem("courseNotes", JSON.stringify(courseNotes));
+        updateAverage();
+      });
+      element.appendChild(notaInput);
+
     } else if (canUnlock(data)) {
       element.classList.add('active');
       element.classList.remove('passed');
@@ -144,18 +186,29 @@ function updateCourses() {
     }
   }
   updateProgressBar();
+  updateAverage();
 }
 
 function updateProgressBar() {
   const total = courseElements.size;
   const passed = passedCourses.size;
   const percent = Math.round((passed / total) * 100);
-
-  const progressBar = document.getElementById('progress-bar');
-  const progressText = document.getElementById('progress-text');
-
   progressBar.style.width = percent + '%';
   progressText.textContent = `${percent}% completado`;
+}
+
+function updateAverage() {
+  const notas = Object.entries(courseNotes)
+    .filter(([id]) => passedCourses.has(id))
+    .map(([_, nota]) => parseFloat(nota))
+    .filter(n => !isNaN(n));
+
+  if (notas.length > 0) {
+    const promedio = notas.reduce((a, b) => a + b, 0) / notas.length;
+    avgDisplay.textContent = `Promedio general: ${promedio.toFixed(2)}`;
+  } else {
+    avgDisplay.textContent = `Promedio general: -`;
+  }
 }
 
 function buildUI() {
